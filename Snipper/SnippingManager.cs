@@ -59,6 +59,19 @@ namespace Snipper
             }
         }
 
+        private string _saveLocation = "";
+        public string SaveLocation
+        {
+            get
+            {
+                return _saveLocation;
+            }
+            set
+            {
+                _saveLocation = value;
+            }
+        }
+
         private SnippingManager()
         {
             
@@ -69,7 +82,7 @@ namespace Snipper
             HotKeyProcesser(e.id);
         }
 
-        public void HotKeyProcesser(int keyID)
+        private void HotKeyProcesser(int keyID)
         {
             if (keyID == Constants.CAP_WINDOW_HOTKEY)
             {
@@ -79,6 +92,11 @@ namespace Snipper
             {
                 AreaSelectionCanvas selectArea = new AreaSelectionCanvas();
             }
+        }
+
+        private void ScreenCapToBitMap()
+        {
+            //SaveLocation
         }
     }
 }

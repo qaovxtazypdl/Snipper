@@ -22,12 +22,19 @@ namespace Snipper
         private Point startPos;
         public double startX, startY, finalX, finalY;
         private int borderWidth = 3;
+        Canvas drawCanvas;
 
         public AreaSelectionCanvas()
             : base()
         {
             InitializeComponent();
             this.mouseDown = false;
+
+            drawCanvas = new Canvas();
+            drawCanvas.MouseUp += MouseUpEventHandler;
+            drawCanvas.MouseMove += MouseMoveEventHandler;
+            drawingGrid.Children.Add(drawCanvas);
+
             SnippingManager.Instance.hkeyWindowCap.Disabled = true;
             SnippingManager.Instance.hkeyAreaCap.Disabled = true;
             startX = startY = finalX = finalY = -1;
@@ -41,22 +48,22 @@ namespace Snipper
             Point upperLeft = new Point(Math.Min(pos1.X, pos2.X), Math.Min(pos1.Y, pos2.Y));
             Point bottomRight = new Point(Math.Max(pos1.X, pos2.X), Math.Max(pos1.Y, pos2.Y));
 
-            Canvas ellipseCanvas = new Canvas();
             Rectangle rect = new Rectangle();
+            rect.MouseUp += MouseUpEventHandler;
+            rect.MouseMove += MouseMoveEventHandler;
             rect.Stroke = Brushes.Black;
 
             Color fillColor = new Color();
-            fillColor.A = 0x2f;
+            fillColor.A = 0x1f;
             fillColor.R = fillColor.G = fillColor.B = 0xff;
             rect.Fill = new SolidColorBrush(fillColor);
 
             rect.Width = bottomRight.X - upperLeft.X + 2 * borderWidth;
             rect.Height = bottomRight.Y - upperLeft.Y + 2 * borderWidth;
             rect.StrokeThickness = borderWidth;
-            ellipseCanvas.Children.Add(rect);
+            drawCanvas.Children.Add(rect);
             Canvas.SetLeft(rect, upperLeft.X - borderWidth);
             Canvas.SetTop(rect, upperLeft.Y - borderWidth);
-            drawingGrid.Children.Add(ellipseCanvas);
         }
 
 
@@ -66,7 +73,7 @@ namespace Snipper
             {
                 Point curPos = e.GetPosition(this);
 
-                drawingGrid.Children.Clear();
+                drawCanvas.Children.Clear();
                 DrawRect(startPos, curPos);
             }
         }
