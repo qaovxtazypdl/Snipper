@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace Snipper
 {
@@ -61,11 +66,11 @@ namespace Snipper
             }
         }
 
-        internal enum SaveMode
+        internal enum SaveMode : int
         {
-            ClipboardOnly,
-            FileOnly,
-            ClipboardAndFile
+            None = 0x0,
+            ToClipboard = 0x1,
+            ToFile = 0x2
         }
 
         private string _saveLocation;
@@ -81,8 +86,8 @@ namespace Snipper
             }
         }
 
-        private SaveMode _savingMode;
-        internal SaveMode SavingMode
+        private int _savingMode;
+        internal int SavingMode
         {
             get
             {
@@ -98,19 +103,19 @@ namespace Snipper
         {
             _hkeyWindowCap = null;
             _hkeyAreaCap = null;
-            _savingMode = SaveMode.ClipboardOnly;
+            _savingMode = (int)SaveMode.ToClipboard | (int)SaveMode.ToFile;
             _saveLocation = "";
         }
 
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref ScreenArea lpRect);
+        static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 
         [DllImport("user32.dll")]
-        static extern IntPtr GetActiveWindow();
+        static extern IntPtr GetForegroundWindow();
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct ScreenArea
+        private struct RECT
         {
             public int Left;
             public int Top;
@@ -127,21 +132,73 @@ namespace Snipper
         {
             if (keyID == Constants.CAP_WINDOW_HOTKEY)
             {
-                ScreenArea lpRect = new ScreenArea();
-                IntPtr hWnd = GetActiveWindow();
-                GetWindowRect(hWnd, ref lpRect);
-                ScreenCapToBitMap(lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
+                RECT lpRect = new RECT();
+                IntPtr hWnd = GetForegroundWindow();
+
+                if (GetWindowRect(hWnd, ref lpRect))
+                {
+                    ProcessScreenshot(lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
+                }
             }
             else if (keyID == Constants.CAP_AREA_HOTKEY)
             {
                 AreaSelectionCanvas selectArea = new AreaSelectionCanvas();
-                ScreenCapToBitMap((int)selectArea.minX, (int)selectArea.minY, (int)selectArea.maxX, (int)selectArea.maxY);
+                if (selectArea.DialogResult == true)
+                {
+                    ProcessScreenshot((int)selectArea.minX, (int)selectArea.minY, (int)selectArea.maxX, (int)selectArea.maxY);
+                }
             }
         }
 
-        private void ScreenCapToBitMap(int minX, int minY, int maxX, int maxY)
+        private void ProcessScreenshot(int minX, int minY, int maxX, int maxY)
         {
-            Console.WriteLine(minX + " " + minY + " " + maxX + " " + maxY);
+            BitmapSource screencap = null;
+
+            int width = maxX - minX;
+            int height = maxY - minY;
+
+            using (Bitmap screenBmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            {
+                using (Graphics bmpGraphics = Graphics.FromImage(screenBmp))
+                {
+                    bmpGraphics.CopyFromScreen(minX, minY, 0, 0, new System.Drawing.Size(width, height));
+                    screencap = Imaging.CreateBitmapSourceFromHBitmap(
+                        screenBmp.GetHbitmap(),
+                        IntPtr.Zero,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+                }
+            }
+
+            if (screencap != null)
+            {
+                if ((SavingMode & (int)SaveMode.ToClipboard) != 0)
+                {
+                    CopyBitmapToClipboard(screencap);
+                }
+                if ((SavingMode & (int)SaveMode.ToFile) != 0)
+                {
+                    SaveBitmapToFile(screencap);
+                }
+            }
+        }
+
+        private void SaveBitmapToFile(BitmapSource screencap)
+        {
+            DateTime currentTime = DateTime.Now;
+            string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
+            Console.WriteLine(filename);
+            using (FileStream fileStream = new FileStream(Path.Combine("Z:\\", filename + ".png"), FileMode.Create))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(screencap));
+                encoder.Save(fileStream);
+            }
+        }
+
+        private void CopyBitmapToClipboard(BitmapSource screencap)
+        {
+            System.Windows.Clipboard.SetImage(screencap);
         }
     }
 }
