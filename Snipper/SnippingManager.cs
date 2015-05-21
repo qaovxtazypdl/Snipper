@@ -141,7 +141,7 @@ namespace Snipper
 
         private void ScreenCapToBitMap(int minX, int minY, int maxX, int maxY)
         {
-
+            Console.WriteLine(minX + " " + minY + " " + maxX + " " + maxY);
         }
     }
 }

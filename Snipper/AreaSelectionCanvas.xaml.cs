@@ -91,13 +91,11 @@ namespace Snipper
             mouseDown = false;
 
             Point finalPos = e.GetPosition(this);
-            maxX = finalPos.X;
-            maxY = finalPos.Y;
 
-            minX = Math.Min(minX, maxX);
-            minY = Math.Min(minY, maxY);
-            maxX = Math.Max(minX, maxX);
-            maxY = Math.Max(minY, maxY);
+            minX = Math.Min(startPos.X, finalPos.X);
+            minY = Math.Min(startPos.Y, finalPos.Y);
+            maxX = Math.Max(startPos.X, finalPos.X);
+            maxY = Math.Max(startPos.Y, finalPos.Y);
 
             ExitCanvas();
         }
