@@ -20,7 +20,7 @@ namespace Snipper
     {
         private bool mouseDown;
         private Point startPos;
-        public double startX, startY, finalX, finalY;
+        public double minX, minY, maxX, maxY;
         private int borderWidth = 3;
         Canvas drawCanvas;
 
@@ -31,13 +31,14 @@ namespace Snipper
             this.mouseDown = false;
 
             drawCanvas = new Canvas();
+            drawCanvas.MouseDown += MouseDownEventHandler;
             drawCanvas.MouseUp += MouseUpEventHandler;
             drawCanvas.MouseMove += MouseMoveEventHandler;
             drawingGrid.Children.Add(drawCanvas);
 
             SnippingManager.Instance.hkeyWindowCap.Disabled = true;
             SnippingManager.Instance.hkeyAreaCap.Disabled = true;
-            startX = startY = finalX = finalY = -1;
+            minX = minY = maxX = maxY = -1;
             ShowDialog();
             this.Activate();
             this.Focus();  
@@ -49,6 +50,7 @@ namespace Snipper
             Point bottomRight = new Point(Math.Max(pos1.X, pos2.X), Math.Max(pos1.Y, pos2.Y));
 
             Rectangle rect = new Rectangle();
+            rect.MouseDown += MouseDownEventHandler;
             rect.MouseUp += MouseUpEventHandler;
             rect.MouseMove += MouseMoveEventHandler;
             rect.Stroke = Brushes.Black;
@@ -89,13 +91,13 @@ namespace Snipper
             mouseDown = false;
 
             Point finalPos = e.GetPosition(this);
-            finalX = finalPos.X;
-            finalY = finalPos.Y;
+            maxX = finalPos.X;
+            maxY = finalPos.Y;
 
-            startX = Math.Min(startX, finalX);
-            startY = Math.Min(startY, finalY);
-            finalX = Math.Max(startX, finalX);
-            finalY = Math.Max(startY, finalY);
+            minX = Math.Min(minX, maxX);
+            minY = Math.Min(minY, maxY);
+            maxX = Math.Max(minX, maxX);
+            maxY = Math.Max(minY, maxY);
 
             ExitCanvas();
         }
@@ -107,7 +109,7 @@ namespace Snipper
             {
                 SnippingManager.Instance.hkeyWindowCap.Disabled = false;
                 SnippingManager.Instance.hkeyAreaCap.Disabled = false;
-                DialogResult = startX >= 0 && startY >= 0 && finalX >= 0 && finalY >= 0 && finalX > startX && finalY > startY;
+                DialogResult = minX >= 0 && minY >= 0 && maxX >= 0 && maxY >= 0 && maxX > minX && maxY > minY;
             }
         }
 

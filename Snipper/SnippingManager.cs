@@ -7,6 +7,8 @@ using System.Xml;
 using System.Windows;
 using System.Windows.Media;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace Snipper
 {
@@ -25,7 +27,7 @@ namespace Snipper
             }
         }
 
-        private HotKey _hkeyWindowCap = null;
+        private HotKey _hkeyWindowCap;
         public HotKey hkeyWindowCap
         {
             get
@@ -42,7 +44,7 @@ namespace Snipper
             }
         }
 
-        private HotKey _hkeyAreaCap = null;
+        private HotKey _hkeyAreaCap;
         public HotKey hkeyAreaCap
         {
             get
@@ -59,8 +61,15 @@ namespace Snipper
             }
         }
 
-        private string _saveLocation = "";
-        public string SaveLocation
+        internal enum SaveMode
+        {
+            ClipboardOnly,
+            FileOnly,
+            ClipboardAndFile
+        }
+
+        private string _saveLocation;
+        internal string SaveLocation
         {
             get
             {
@@ -72,11 +81,43 @@ namespace Snipper
             }
         }
 
+        private SaveMode _savingMode;
+        internal SaveMode SavingMode
+        {
+            get
+            {
+                return _savingMode;
+            }
+            set
+            {
+                _savingMode = value;
+            }
+        }
+
         private SnippingManager()
         {
-            
+            _hkeyWindowCap = null;
+            _hkeyAreaCap = null;
+            _savingMode = SaveMode.ClipboardOnly;
+            _saveLocation = "";
         }
-       
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, ref ScreenArea lpRect);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetActiveWindow();
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ScreenArea
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
         public void HotKeyHandler(Object sender, HotKeyEventArgs e)
         {
             HotKeyProcesser(e.id);
@@ -86,17 +127,21 @@ namespace Snipper
         {
             if (keyID == Constants.CAP_WINDOW_HOTKEY)
             {
-                //get window
+                ScreenArea lpRect = new ScreenArea();
+                IntPtr hWnd = GetActiveWindow();
+                GetWindowRect(hWnd, ref lpRect);
+                ScreenCapToBitMap(lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
             }
             else if (keyID == Constants.CAP_AREA_HOTKEY)
             {
                 AreaSelectionCanvas selectArea = new AreaSelectionCanvas();
+                ScreenCapToBitMap((int)selectArea.minX, (int)selectArea.minY, (int)selectArea.maxX, (int)selectArea.maxY);
             }
         }
 
-        private void ScreenCapToBitMap()
+        private void ScreenCapToBitMap(int minX, int minY, int maxX, int maxY)
         {
-            //SaveLocation
+
         }
     }
 }
