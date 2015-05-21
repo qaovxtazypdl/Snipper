@@ -77,7 +77,7 @@ namespace Snipper
             }
             else if (keyID == Constants.CAP_AREA_HOTKEY)
             {
-                new AreaSelectionCanvas();
+                AreaSelectionCanvas selectArea = new AreaSelectionCanvas();
             }
         }
     }

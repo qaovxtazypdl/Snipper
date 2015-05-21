@@ -21,6 +21,7 @@ namespace Snipper
         private bool mouseDown;
         private Point startPos;
         public double startX, startY, finalX, finalY;
+        private int borderWidth = 3;
 
         public AreaSelectionCanvas()
             : base()
@@ -37,16 +38,24 @@ namespace Snipper
 
         private void DrawRect(Point pos1, Point pos2)
         {
+            Point upperLeft = new Point(Math.Min(pos1.X, pos2.X), Math.Min(pos1.Y, pos2.Y));
+            Point bottomRight = new Point(Math.Max(pos1.X, pos2.X), Math.Max(pos1.Y, pos2.Y));
+
             Canvas ellipseCanvas = new Canvas();
             Rectangle rect = new Rectangle();
             rect.Stroke = Brushes.Black;
-            rect.Fill = Brushes.AliceBlue;
-            rect.Width = pos2.X - pos1.X;
-            rect.Height = pos2.Y - pos1.Y;
-            rect.StrokeThickness = 3;
+
+            Color fillColor = new Color();
+            fillColor.A = 0x2f;
+            fillColor.R = fillColor.G = fillColor.B = 0xff;
+            rect.Fill = new SolidColorBrush(fillColor);
+
+            rect.Width = bottomRight.X - upperLeft.X + 2 * borderWidth;
+            rect.Height = bottomRight.Y - upperLeft.Y + 2 * borderWidth;
+            rect.StrokeThickness = borderWidth;
             ellipseCanvas.Children.Add(rect);
-            Canvas.SetLeft(rect, pos1.X);
-            Canvas.SetTop(rect, pos1.Y);
+            Canvas.SetLeft(rect, upperLeft.X - borderWidth);
+            Canvas.SetTop(rect, upperLeft.Y - borderWidth);
             drawingGrid.Children.Add(ellipseCanvas);
         }
 
