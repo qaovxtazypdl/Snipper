@@ -3,19 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:local="clr-namespace:Snipper"
-        Title="MainWindow" Height="518.02" Width="820.376"
-        WindowState="Minimized" Visibility="Hidden">
-    <Grid>
+        Title="Snipper Settings" Height="327.044" Width="204.802" Icon="Snipper.ico" AllowsTransparency="True" WindowStyle="None"
+        MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized">
+    <Grid Margin="0,0,431,0">
         <!-- declare the command as a local resource -->
         <Grid.Resources>
             <local:ShowCommand x:Key="ShowCommand" />
             <local:CloseCommand x:Key="CloseCommand" />
         </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="61*"/>
+            <ColumnDefinition Width="15*"/>
+        </Grid.ColumnDefinitions>
         <!-- declare the NotifyIcon and configure commands with parameters -->
         <tb:TaskbarIcon
             ToolTipText="Snipper" IconSource="Snipper.ico"
             LeftClickCommand="{StaticResource ShowCommand}"
-            DoubleClickCommand="{StaticResource ShowCommand}">
+            DoubleClickCommand="{StaticResource ShowCommand}" Grid.ColumnSpan="2">
             <!-- context menu  -->
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
@@ -24,5 +28,33 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
+        <Border Margin="10,232,-195,0" BorderThickness="1" BorderBrush="#FFEA6000" Grid.ColumnSpan="2" Background="White" Height="54" VerticalAlignment="Top">
+            <Grid Margin="-2,2,-2,-2">
+                <CheckBox Content="Save to Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="116" Margin="10,6,0,0"/>
+                <CheckBox Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Height="20" Width="116"/>
+            </Grid>
+        </Border>
+        <Border Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="185" Margin="10,294,-195,0" BorderThickness="1" BorderBrush="#FF5D89FF" >
+            <Button Content="Save" Click="SaveButton_Click" Background="White" BorderThickness="1" BorderBrush="{x:Null}" Height="23" HorizontalAlignment="Left" Width="183" Margin="0,0,0,0"/>
+        </Border>
+        <Border Grid.ColumnSpan="2" Margin="10,171,-195,0" BorderThickness="1" BorderBrush="#FFEA6000" Height="53" VerticalAlignment="Top">
+            <Grid Margin="-2,8,0,-8">
+                <TextBox Height="23" Margin="10,0,10,15" TextWrapping="Wrap" VerticalAlignment="Bottom" TextChanged="TextBox_TextChanged"/>
+                <Label Content="Image Save Directory:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="177" Margin="2,-9,0,0"/>
+            </Grid>
+        </Border>
+        <Border Grid.ColumnSpan="2" Margin="10,66,-195,0" BorderBrush="#FFEA6000" BorderThickness="1" Height="97" VerticalAlignment="Top">
+            <Grid>
+                <TextBox Height="23" Margin="10,65,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextChanged="TextBox_TextChanged"/>
+                <Label Content="Custom Selection:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="167" Margin="0,43,0,0"/>
+                <TextBox Height="23" Margin="10,22,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextChanged="TextBox_TextChanged"/>
+                <Label Content="Foreground Window:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="167"/>
+            </Grid>
+        </Border>
+        <Label Grid.ColumnSpan="2" Content="Capture Hotkeys:" HorizontalAlignment="Left" Margin="10,43,-195,0" VerticalAlignment="Top" Width="185"/>
+        <Image Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="30" Margin="15,10,-48,0" VerticalAlignment="Top" Width="33" Source="Snipper.ico"/>
+        <Label Grid.ColumnSpan="2" Content="Snipper" HorizontalAlignment="Left" Margin="48,10,-135,0" VerticalAlignment="Top" Width="87" FontFamily="Walkway" FontSize="20" FontWeight="Bold" Height="35"/>
+        <Button Content="" Click="SaveButton_Click" Background="#FF930000" BorderThickness="1" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="14" Margin="181,10,-195,303" Grid.ColumnSpan="2" FontSize="7"/>
+        <Button Content="" Click="SaveButton_Click" Background="#FF00C373" BorderThickness="1" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="14" Margin="167,10,-181,303" Grid.ColumnSpan="2" FontSize="7"/>
     </Grid>
 </Window>

@@ -49,7 +49,6 @@ namespace Snipper
             SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.B, SnippingManager.Instance.HotKeyHandler);
         }
 
-        public string SAVE_FOLDER_PATH = "Z:\\testPICS";
         public void SaveSettings()
         {
 
@@ -110,6 +109,22 @@ namespace Snipper
                 }
             }
             base.OnClosed(e);
+        }
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                this.DragMove();
+            }
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }
