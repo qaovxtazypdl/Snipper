@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using System.IO;
 
 namespace Snipper
 {
@@ -36,6 +37,8 @@ namespace Snipper
 
         public event EventHandler ShowEvent;
         public event EventHandler CloseEvent;
+        private string SaveDirectory;
+        private bool settingsDirty;
 
         private MainWindow() : base()
         {
@@ -43,20 +46,11 @@ namespace Snipper
             ShowEvent += ShowEventHandler;
             CloseEvent += CloseEventHandler;
             LoadSettings();
+            settingsDirty = false;
             //SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N9, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.N, SnippingManager.Instance.HotKeyHandler);
             //SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N8, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.B, SnippingManager.Instance.HotKeyHandler);
-        }
-
-        public void SaveSettings()
-        {
-
-        }
-
-        public void LoadSettings()
-        {
-
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -88,6 +82,8 @@ namespace Snipper
         private void ShowEventHandler(object sender, EventArgs e)
         {
             this.Show();
+            this.Activate();
+            this.Focus();  
             if (this.WindowState == WindowState.Minimized)
             {
                 this.WindowState = WindowState.Normal;
@@ -120,9 +116,46 @@ namespace Snipper
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            SaveSettings();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void SaveDirectoryTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox source = (TextBox)sender;
+            SaveDirectory = source.Text;
+            settingsDirty = true;
+        }
+
+        private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            settingsDirty = true;
+        }
+
+        private void SelectionCapTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            settingsDirty = true;
+        }
+
+        public void SaveSettings()
+        {
+            settingsDirty = false;
+        }
+
+        public void LoadSettings()
+        {
+            settingsDirty = false;
+        }
+
+        public void PromptSave()
         {
 
         }
