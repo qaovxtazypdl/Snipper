@@ -130,6 +130,9 @@ namespace Snipper
             public int Bottom;
         }
 
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+
         public void HotKeyHandler(Object sender, HotKeyEventArgs e)
         {
             MainWindow.Instance.TrayIcon.HideBalloonTip();
@@ -182,12 +185,14 @@ namespace Snipper
             {
                 using (Graphics bmpGraphics = Graphics.FromImage(screenBmp))
                 {
+                    IntPtr Hbitmap = screenBmp.GetHbitmap();
                     bmpGraphics.CopyFromScreen(minX, minY, 0, 0, new System.Drawing.Size(width, height));
                     screencap = Imaging.CreateBitmapSourceFromHBitmap(
-                        screenBmp.GetHbitmap(),
+                        Hbitmap,
                         IntPtr.Zero,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
+                    DeleteObject(Hbitmap);
                 }
             }
 
