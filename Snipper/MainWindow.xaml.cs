@@ -141,16 +141,19 @@ namespace Snipper
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             SaveSettings();
+            e.Handled = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             CancelSave();
+            e.Handled = true;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+            e.Handled = true;
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -161,6 +164,7 @@ namespace Snipper
             }
             this.WindowState = WindowState.Minimized;
             this.Hide();
+            e.Handled = true;
         }
 
         private void SaveDirectoryTextBox_TextChanged(object sender, RoutedEventArgs e)
@@ -168,30 +172,35 @@ namespace Snipper
             TextBox source = (TextBox)sender;
             SaveDirectory = source.Text;
             SettingsDirty = true;
+            e.Handled = true;
         }
 
         private void SaveDirButton_Checked(object sender, RoutedEventArgs e)
         {
             SaveToFolderChecked = true;
             SettingsDirty = true;
+            e.Handled = true;
         }
 
         void SaveDirButton_Unchecked(object sender, RoutedEventArgs e)
         {
             SaveToFolderChecked = false;
             SettingsDirty = true;
+            e.Handled = true;
         }
 
         private void CopyClipboardButton_Checked(object sender, RoutedEventArgs e)
         {
             CopyToClipboardChecked = true;
             SettingsDirty = true;
+            e.Handled = true;
         }
 
         void CopyClipboardButton_Unchecked(object sender, RoutedEventArgs e)
         {
             CopyToClipboardChecked = false;
             SettingsDirty = true;
+            e.Handled = true;
         }
 
         private bool SaveSettings()
@@ -264,18 +273,9 @@ namespace Snipper
             SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.SaveLocation = SaveDirectory;
             uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) | (uint)(SaveToFolderChecked? 0x2 : 0x0);
-            Console.WriteLine(saveModeMask);
             SnippingManager.Instance.SavingMode = saveModeMask;
             ReloadUISettings();
             SettingsDirty = false;
-        }
-
-        private void ReloadUISettings()
-        {
-            SaveFolderCheckBox.IsChecked = SaveToFolderChecked;
-            CopyClipCheckBox.IsChecked = CopyToClipboardChecked;
-            SaveDirTextBox.Text = SaveDirectory;
-            //TODO
         }
 
         private void BackupCurrentSettings() {
@@ -433,28 +433,69 @@ namespace Snipper
             ReloadUISettings();
         }
 
+        private void ReloadUISettings()
+        {
+            SaveFolderCheckBox.IsChecked = SaveToFolderChecked;
+            CopyClipCheckBox.IsChecked = CopyToClipboardChecked;
+            SaveDirTextBox.Text = SaveDirectory;
+            WinSelTextBox.Text = GetKeyComboString(WindowCapModifiers, WindowCapKey);
+            AreaSelTextBox.Text = GetKeyComboString(SelectionCapModifiers, SelectionCapKey);
+        }
+
+        private string GetKeyComboString(uint modifiers, uint key) 
+        {
+            string combo = "";
+            if ((modifiers & (uint)ModifierKeys.Control) != 0)
+            {
+                combo += "CTRL+";
+            }
+            if ((modifiers & (uint)ModifierKeys.Alt) != 0)
+            {
+                combo += "ALT+";
+            }
+            if ((modifiers & (uint)ModifierKeys.Shift) != 0)
+            {
+                combo += "SHIFT+";
+            }
+            if (key == 0)
+            {
+                combo += "...";
+            }
+            else
+            {
+                combo += Constants.vkeyMap[key];
+            }
+            return combo;
+        }
+
         private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            SettingsDirty = true;
+            uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
+            uint modifiers = (uint)e.KeyboardDevice.Modifiers;
+            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0)
+            {
+                WinSelTextBox.Text = GetKeyComboString(modifiers, (uint)KeyInterop.VirtualKeyFromKey(e.Key));
+                WindowCapKey = vkey;
+                WindowCapModifiers = modifiers;
+                SettingsDirty = true;
+            }
         }
 
         private void SelectionCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            SettingsDirty = true;
-        }
-
-        private void WindowCapTextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            SettingsDirty = true;
-        }
-
-        private void SelectionCapTextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            SettingsDirty = true;
+            uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
+            uint modifiers = (uint)e.KeyboardDevice.Modifiers;
+            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0)
+            {
+                AreaSelTextBox.Text = GetKeyComboString(modifiers, (uint)KeyInterop.VirtualKeyFromKey(e.Key));
+                SelectionCapKey = vkey;
+                SelectionCapModifiers = modifiers;
+                SettingsDirty = true;
+            }
         }
     }
 }
 
 //TODO: minimize button remove focus
-//implement the 4 functions above
-//nice bg image/ transparency for the main window.
+//check if hotkey registered with same mod and key.
+//save button glitchy
