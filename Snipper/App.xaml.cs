@@ -27,7 +27,7 @@ namespace Snipper
             if (!singleInstanceLock.WaitOne(0, false))
             {
                 MessageBox.Show("Instance already running.");
-                Snipper.MainWindow.Instance.Close();
+                Application.Current.Shutdown();
             }
             else
             {

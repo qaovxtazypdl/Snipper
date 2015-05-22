@@ -118,6 +118,7 @@ namespace Snipper
 
         public void HotKeyHandler(Object sender, HotKeyEventArgs e)
         {
+            MainWindow.Instance.TrayIcon.HideBalloonTip();
             string result = HotKeyProcesser(e.id);
             if (result == "")
             {
