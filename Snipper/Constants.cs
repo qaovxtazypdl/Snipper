@@ -13,6 +13,16 @@ namespace Snipper
         public const int CAP_AREA_HOTKEY = 2;
 
         public const string APP_GUID = "f2d44a6c-b312-430d-b18c-914e8cbe11b2";
+        public const string SETTINGS_FILE_NAME = "settings.xml";
+
+        public const string SETTINGS_TAG = "settings";
+        public const string SAVE_DIR_TAG = "savedir";
+        public const string SEL_CAP_HKEY_TAG = "selcaphkey";
+        public const string WIN_CAP_HKEY_TAG = "wincaphkey";
+        public const string COPY_CLIP_TAG = "docopyclip";
+        public const string SAVE_IMAGE_TAG = "dosaveimage";
+        public const string MODIFIERS_TAG = "mod";
+        public const string KEY_TAG = "key";
     }
 
     /// <summary>

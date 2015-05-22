@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.IO;
+using System.Xml;
 
 namespace Snipper
 {
@@ -37,8 +38,23 @@ namespace Snipper
 
         public event EventHandler ShowEvent;
         public event EventHandler CloseEvent;
+
         private string SaveDirectory;
-        private bool settingsDirty;
+        private uint WindowCapModifiers, WindowCapKey, SelectionCapModifiers, SelectionCapKey;
+        private bool SaveToFolderChecked, CopyToClipboardChecked;
+        private bool _SettingsDirty;
+        private bool SettingsDirty
+        {
+            get
+            {
+                return _SettingsDirty;
+            }
+            set
+            {
+                SaveButton.IsEnabled = value;
+                _SettingsDirty = value;
+            }
+        }
 
         private MainWindow() : base()
         {
@@ -46,7 +62,11 @@ namespace Snipper
             ShowEvent += ShowEventHandler;
             CloseEvent += CloseEventHandler;
             LoadSettings();
-            settingsDirty = false;
+            SettingsDirty = false;
+            SaveDirectory = "?";
+            WindowCapModifiers = WindowCapKey = SelectionCapModifiers = SelectionCapKey = 0;
+            SaveToFolderChecked = CopyToClipboardChecked = false;
+
             //SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N9, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.N, SnippingManager.Instance.HotKeyHandler);
             //SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N8, SnippingManager.Instance.HotKeyHandler);
@@ -128,36 +148,241 @@ namespace Snipper
             this.WindowState = WindowState.Minimized;
         }
 
-        private void SaveDirectoryTextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void SaveDirectoryTextBox_TextChanged(object sender, RoutedEventArgs e)
         {
             TextBox source = (TextBox)sender;
             SaveDirectory = source.Text;
-            settingsDirty = true;
+            SettingsDirty = true;
         }
+
+        private void SaveDirButton_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox source = (CheckBox)sender;
+            SaveToFolderChecked = source.IsChecked == true;
+            SettingsDirty = true;
+        }
+
+        private void CopyClipboardButton_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox source = (CheckBox)sender;
+            CopyToClipboardChecked = source.IsChecked == true;
+            SettingsDirty = true;
+        }
+
+        private void SaveSettings()
+        {
+            XmlWriterSettings xmlSettings = new XmlWriterSettings();
+            xmlSettings.Indent = true;
+
+            XmlWriter xmlWriter = XmlWriter.Create(Constants.SETTINGS_FILE_NAME, xmlSettings);
+            xmlWriter.WriteStartDocument();
+
+            xmlWriter.WriteStartElement(Constants.SETTINGS_TAG);
+            {
+                xmlWriter.WriteStartElement(Constants.SAVE_DIR_TAG);
+                xmlWriter.WriteString(SaveDirectory);
+                xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement(Constants.SEL_CAP_HKEY_TAG);
+                xmlWriter.WriteStartElement(Constants.MODIFIERS_TAG);
+                {
+                    xmlWriter.WriteString("" + SelectionCapModifiers);
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteStartElement(Constants.KEY_TAG);
+                {
+                    xmlWriter.WriteString("" + SelectionCapKey);
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement(Constants.WIN_CAP_HKEY_TAG);
+                xmlWriter.WriteStartElement(Constants.MODIFIERS_TAG);
+                {
+                    xmlWriter.WriteString("" + WindowCapModifiers);
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteStartElement(Constants.KEY_TAG);
+                {
+                    xmlWriter.WriteString("" + WindowCapKey);
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement(Constants.COPY_CLIP_TAG);
+                xmlWriter.WriteString("" + CopyToClipboardChecked);
+                xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement(Constants.SAVE_IMAGE_TAG);
+                xmlWriter.WriteString("" + SaveToFolderChecked);
+                xmlWriter.WriteEndElement();
+            }
+
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+
+            ApplySettings();
+        }
+
+        private void ApplySettings()
+        {
+            SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, WindowCapModifiers, WindowCapKey, SnippingManager.Instance.HotKeyHandler);
+            SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
+            SnippingManager.Instance.SaveLocation = SaveDirectory;
+            uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) & (uint)(SaveToFolderChecked? 0x1 : 0x0);
+            SnippingManager.Instance.SavingMode = saveModeMask;
+            SettingsDirty = false;
+
+            SaveFolderCheckBox.IsChecked = SaveToFolderChecked;
+            CopyClipCheckBox.IsChecked = CopyToClipboardChecked;
+            SaveDirTextBox.Text = SaveDirectory;
+            //
+        }
+
+        private void LoadSettings()
+        {
+            try
+            {
+                using (XmlReader reader = XmlReader.Create(Constants.SETTINGS_FILE_NAME))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element)
+                        {
+                            if (reader.Name == Constants.SETTINGS_TAG)
+                            {
+                                LoadSettings(reader);
+                            }
+                        }
+                        else if (reader.NodeType == XmlNodeType.EndElement)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                //fail silently
+            }
+            ApplySettings();
+        }
+
+        private void LoadSettings(XmlReader reader) {
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name == Constants.SAVE_DIR_TAG)
+                    {
+                        reader.Read(); //read value node
+                        SaveDirectory = reader.Value;
+                        reader.Read(); //read end tag
+                    }
+                    else if (reader.Name == Constants.SEL_CAP_HKEY_TAG)
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.Name == Constants.MODIFIERS_TAG)
+                            {
+                                reader.Read();
+                                SelectionCapModifiers = (uint)Int32.Parse(reader.Value);
+                                reader.Read();
+                            }
+                            else if (reader.Name == Constants.KEY_TAG)
+                            {
+                                reader.Read();
+                                SelectionCapKey = (uint)Int32.Parse(reader.Value);
+                                reader.Read();
+                            }
+                            else if (reader.NodeType == XmlNodeType.EndElement)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if (reader.Name == Constants.WIN_CAP_HKEY_TAG)
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.Name == Constants.MODIFIERS_TAG)
+                            {
+                                reader.Read();
+                                WindowCapModifiers = (uint)Int32.Parse(reader.Value);
+                                reader.Read();
+                            }
+                            else if (reader.Name == Constants.KEY_TAG)
+                            {
+                                reader.Read();
+                                WindowCapKey = (uint)Int32.Parse(reader.Value);
+                                reader.Read();
+                            }
+                            else if (reader.NodeType == XmlNodeType.EndElement)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if (reader.Name == Constants.COPY_CLIP_TAG)
+                    {
+                        reader.Read();
+                        CopyToClipboardChecked = reader.Value == ("" + true);
+                        reader.Read();
+                    }
+                    else if (reader.Name == Constants.SAVE_IMAGE_TAG)
+                    {
+                        reader.Read();
+                        SaveToFolderChecked = reader.Value == ("" + true);
+                        reader.Read();
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    break;
+                }
+            }
+        }
+
+        private void PromptSaveIfDirty()
+        {
+            MessageBoxResult saveWarningResult = MessageBox.Show("You have unsaved changes. Save?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (saveWarningResult == MessageBoxResult.Yes)
+            {
+                SaveSettings();
+            }
+            else
+            {
+                CancelSave();
+            }
+        }
+
+        private void CancelSave();
 
         private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            settingsDirty = true;
+            SettingsDirty = true;
         }
 
         private void SelectionCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            settingsDirty = true;
+            SettingsDirty = true;
         }
 
-        public void SaveSettings()
+        private void WindowCapTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            settingsDirty = false;
+            SettingsDirty = true;
         }
 
-        public void LoadSettings()
+        private void SelectionCapTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            settingsDirty = false;
-        }
-
-        public void PromptSave()
-        {
-
+            SettingsDirty = true;
         }
     }
 }
+
+//TODO: minimize button remove focus
+//implement the 9 functions above
+//nice bg image/ transparency for the main window.
+//error checking on dir existnecen

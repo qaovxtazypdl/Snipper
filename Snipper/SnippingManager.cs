@@ -66,7 +66,7 @@ namespace Snipper
             }
         }
 
-        internal enum SaveMode : int
+        internal enum SaveMode : uint
         {
             None = 0x0,
             ToClipboard = 0x1,
@@ -74,7 +74,7 @@ namespace Snipper
         }
 
         private string _saveLocation;
-        internal string SaveLocation
+        public string SaveLocation
         {
             get
             {
@@ -86,8 +86,8 @@ namespace Snipper
             }
         }
 
-        private int _savingMode;
-        internal int SavingMode
+        private uint _savingMode;
+        public uint SavingMode
         {
             get
             {
@@ -103,7 +103,7 @@ namespace Snipper
         {
             _hkeyWindowCap = null;
             _hkeyAreaCap = null;
-            _savingMode = (int)SaveMode.ToClipboard | (int)SaveMode.ToFile;
+            _savingMode = (uint)SaveMode.ToClipboard | (uint)SaveMode.ToFile;
             _saveLocation = "";
         }
 
@@ -172,11 +172,11 @@ namespace Snipper
 
             if (screencap != null)
             {
-                if ((SavingMode & (int)SaveMode.ToClipboard) != 0)
+                if ((SavingMode & (uint)SaveMode.ToClipboard) != 0)
                 {
                     CopyBitmapToClipboard(screencap);
                 }
-                if ((SavingMode & (int)SaveMode.ToFile) != 0)
+                if ((SavingMode & (uint)SaveMode.ToFile) != 0)
                 {
                     SaveBitmapToFile(screencap);
                 }
@@ -188,7 +188,7 @@ namespace Snipper
             DateTime currentTime = DateTime.Now;
             string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
             Console.WriteLine(filename);
-            using (FileStream fileStream = new FileStream(Path.Combine("Z:\\", filename + ".png"), FileMode.Create))
+            using (FileStream fileStream = new FileStream(Path.Combine(SaveLocation, filename + ".png"), FileMode.Create))
             {
                 BitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(screencap));
