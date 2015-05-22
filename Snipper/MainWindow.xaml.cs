@@ -114,7 +114,12 @@ namespace Snipper
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            PromptSaveIfDirty();
+            if (!PromptSaveIfDirty())
+            {
+                e.Cancel = true;
+                return;
+            }
+
             if (HotKeyWindow.RegisteredKeys != null)
             {
                 foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
@@ -150,7 +155,10 @@ namespace Snipper
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
-            PromptSaveIfDirty();
+            if (!PromptSaveIfDirty())
+            {
+                return;
+            }
             this.WindowState = WindowState.Minimized;
             this.Hide();
         }
@@ -164,20 +172,35 @@ namespace Snipper
 
         private void SaveDirButton_Checked(object sender, RoutedEventArgs e)
         {
-            CheckBox source = (CheckBox)sender;
-            SaveToFolderChecked = source.IsChecked == true;
+            SaveToFolderChecked = true;
+            SettingsDirty = true;
+        }
+
+        void SaveDirButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SaveToFolderChecked = false;
             SettingsDirty = true;
         }
 
         private void CopyClipboardButton_Checked(object sender, RoutedEventArgs e)
         {
-            CheckBox source = (CheckBox)sender;
-            CopyToClipboardChecked = source.IsChecked == true;
-            SettingsDirty = true;  
+            CopyToClipboardChecked = true;
+            SettingsDirty = true;
         }
 
-        private void SaveSettings()
+        void CopyClipboardButton_Unchecked(object sender, RoutedEventArgs e)
         {
+            CopyToClipboardChecked = false;
+            SettingsDirty = true;
+        }
+
+        private bool SaveSettings()
+        {
+            if (!CheckDirExistence(SaveDirectory))
+            {
+                return false;
+            }
+
             XmlWriterSettings xmlSettings = new XmlWriterSettings();
             xmlSettings.Indent = true;
 
@@ -230,6 +253,7 @@ namespace Snipper
             xmlWriter.Close();
 
             ApplySettings();
+            return true;
         }
 
         private void ApplySettings()
@@ -239,10 +263,11 @@ namespace Snipper
             SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, WindowCapModifiers, WindowCapKey, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.SaveLocation = SaveDirectory;
-            uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) & (uint)(SaveToFolderChecked? 0x2 : 0x0);
+            uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) | (uint)(SaveToFolderChecked? 0x2 : 0x0);
+            Console.WriteLine(saveModeMask);
             SnippingManager.Instance.SavingMode = saveModeMask;
-            SettingsDirty = false;
             ReloadUISettings();
+            SettingsDirty = false;
         }
 
         private void ReloadUISettings()
@@ -290,6 +315,7 @@ namespace Snipper
                 //fail silently
             }
             ApplySettings();
+            if (!CheckDirExistence(SaveDirectory)) return;
         }
 
         private void LoadSettings(XmlReader reader) {
@@ -367,20 +393,32 @@ namespace Snipper
             }
         }
 
-        private void PromptSaveIfDirty()
+        //returns whether save failed
+        private bool PromptSaveIfDirty()
         {
             if (SettingsDirty)
             {
-                MessageBoxResult saveWarningResult = MessageBox.Show("You have unsaved changes. Save?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxResult saveWarningResult = MessageBox.Show("You have unsaved changes. Save?", "Snipper - Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (saveWarningResult == MessageBoxResult.Yes)
                 {
-                    SaveSettings();
+                    return SaveSettings();
                 }
                 else
                 {
                     CancelSave();
                 }
             }
+            return true;
+        }
+
+        private bool CheckDirExistence(string dir)
+        {
+            if (!Directory.Exists(dir))
+            {
+                MessageBox.Show("The directory supplied does not exist. Please create the directory or enter a valid one.", "Snipper - Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+            return true;
         }
 
         private void CancelSave()
@@ -420,4 +458,3 @@ namespace Snipper
 //TODO: minimize button remove focus
 //implement the 9 functions above
 //nice bg image/ transparency for the main window.
-//error checking on dir existnecen

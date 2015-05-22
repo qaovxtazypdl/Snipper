@@ -179,7 +179,6 @@ namespace Snipper
         {
             DateTime currentTime = DateTime.Now;
             string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
-            Console.WriteLine(filename);
             using (FileStream fileStream = new FileStream(Path.Combine(SaveLocation, filename + ".png"), FileMode.Create))
             {
                 BitmapEncoder encoder = new PngBitmapEncoder();

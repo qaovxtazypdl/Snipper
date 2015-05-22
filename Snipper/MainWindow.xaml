@@ -29,8 +29,8 @@
         </tb:TaskbarIcon>
         <Border Margin="10,232,-195,0" BorderThickness="1" BorderBrush="#FFEA6000" Grid.ColumnSpan="2" Height="54" VerticalAlignment="Top">
             <Grid Margin="-2,2,-2,-2">
-                <CheckBox x:Name="SaveFolderCheckBox" Content="Save to Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="116" Margin="10,6,0,0" Checked="SaveDirButton_Checked"/>
-                <CheckBox x:Name="CopyClipCheckBox" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Height="20" Width="116" Checked="CopyClipboardButton_Checked"/>
+                <CheckBox x:Name="SaveFolderCheckBox" Content="Save to Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="116" Margin="10,6,0,0" Checked="SaveDirButton_Checked" Unchecked="SaveDirButton_Unchecked"/>
+                <CheckBox x:Name="CopyClipCheckBox" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Height="20" Width="116" Checked="CopyClipboardButton_Checked" Unchecked="CopyClipboardButton_Unchecked"/>
             </Grid>
         </Border>
         <Border Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Margin="10,294,-95,0" BorderThickness="1" BorderBrush="#FF5D89FF" >
