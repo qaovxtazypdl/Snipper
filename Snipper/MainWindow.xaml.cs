@@ -456,5 +456,5 @@ namespace Snipper
 }
 
 //TODO: minimize button remove focus
-//implement the 9 functions above
+//implement the 4 functions above
 //nice bg image/ transparency for the main window.

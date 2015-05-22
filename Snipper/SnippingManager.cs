@@ -101,13 +101,13 @@ namespace Snipper
 
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+        static extern bool GetWindowRect(IntPtr hWnd, ref REKT lpRect);
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct RECT
+        private struct REKT
         {
             public int Left;
             public int Top;
@@ -124,7 +124,7 @@ namespace Snipper
         {
             if (keyID == Constants.CAP_WINDOW_HOTKEY)
             {
-                RECT lpRect = new RECT();
+                REKT lpRect = new REKT();
                 IntPtr hWnd = GetForegroundWindow();
 
                 if (GetWindowRect(hWnd, ref lpRect))
