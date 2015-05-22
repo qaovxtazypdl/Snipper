@@ -495,7 +495,3 @@ namespace Snipper
         }
     }
 }
-
-//TODO: minimize button remove focus
-//check if hotkey registered with same mod and key.
-//save button glitchy
