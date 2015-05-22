@@ -14,6 +14,7 @@ using System.Windows.Interop;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace Snipper
 {
@@ -117,11 +118,20 @@ namespace Snipper
 
         public void HotKeyHandler(Object sender, HotKeyEventArgs e)
         {
-            HotKeyProcesser(e.id);
+            string result = HotKeyProcesser(e.id);
+            if (result == "")
+            {
+                MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", "Snip completed successfully.", BalloonIcon.Info);
+            }
+            else
+            {
+                MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", result, BalloonIcon.Warning);
+            }
         }
 
-        private void HotKeyProcesser(int keyID)
+        private string HotKeyProcesser(int keyID)
         {
+            string result = "";
             if (keyID == Constants.CAP_WINDOW_HOTKEY)
             {
                 REKT lpRect = new REKT();
@@ -129,7 +139,7 @@ namespace Snipper
 
                 if (GetWindowRect(hWnd, ref lpRect))
                 {
-                    ProcessScreenshot(lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
+                    result += ProcessScreenshot(lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
                 }
             }
             else if (keyID == Constants.CAP_AREA_HOTKEY)
@@ -137,12 +147,13 @@ namespace Snipper
                 AreaSelectionCanvas selectArea = new AreaSelectionCanvas();
                 if (selectArea.DialogResult == true)
                 {
-                    ProcessScreenshot((int)selectArea.minX, (int)selectArea.minY, (int)selectArea.maxX, (int)selectArea.maxY);
+                    result += ProcessScreenshot((int)selectArea.minX, (int)selectArea.minY, (int)selectArea.maxX, (int)selectArea.maxY);
                 }
             }
+            return result;
         }
 
-        private void ProcessScreenshot(int minX, int minY, int maxX, int maxY)
+        private string ProcessScreenshot(int minX, int minY, int maxX, int maxY)
         {
             BitmapSource screencap = null;
 
@@ -164,18 +175,24 @@ namespace Snipper
 
             if (screencap != null)
             {
+                string result = "";
                 if ((SavingMode & (uint)SaveMode.ToClipboard) != 0)
                 {
-                    CopyBitmapToClipboard(screencap);
+                    result += CopyBitmapToClipboard(screencap);
                 }
                 if ((SavingMode & (uint)SaveMode.ToFile) != 0)
                 {
-                    SaveBitmapToFile(screencap);
+                    result += SaveBitmapToFile(screencap);
                 }
+                return result;
+            }
+            else
+            {
+                return "No image was captured. (null bitmap) ";
             }
         }
 
-        private void SaveBitmapToFile(BitmapSource screencap)
+        private string SaveBitmapToFile(BitmapSource screencap)
         {
             DateTime currentTime = DateTime.Now;
             string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
@@ -190,14 +207,15 @@ namespace Snipper
             }
             catch (UnauthorizedAccessException)
             {
-                //just ignore the error for now.
+                return "Could not save to directory - no write access. ";
             }
-
+            return "";
         }
 
-        private void CopyBitmapToClipboard(BitmapSource screencap)
+        private string CopyBitmapToClipboard(BitmapSource screencap)
         {
             System.Windows.Clipboard.SetImage(screencap);
+            return "";
         }
 
         public void ClearHotkeys()

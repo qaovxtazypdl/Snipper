@@ -16,7 +16,7 @@
             <ColumnDefinition Width="15*"/>
         </Grid.ColumnDefinitions>
         <!-- declare the NotifyIcon and configure commands with parameters -->
-        <tb:TaskbarIcon
+        <tb:TaskbarIcon x:Name="TrayIcon"
             ToolTipText="Snipper" IconSource="Snipper.ico"
             TrayLeftMouseDown="ShowEventHandler">
             <!-- context menu  -->

@@ -16,6 +16,7 @@ using System.Threading;
 using System.IO;
 using System.Xml;
 using System.ComponentModel;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace Snipper
 {
@@ -76,6 +77,7 @@ namespace Snipper
             SaveToFolderChecked = CopyToClipboardChecked = false;
             BackupCurrentSettings();
             LoadSettings();
+            TrayIcon.ShowBalloonTip("Snipper", "Initialized in minimized mode.", BalloonIcon.Info);
         }
 
         public void ExecuteShowEvent()
