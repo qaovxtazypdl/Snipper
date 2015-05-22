@@ -23,6 +23,7 @@ namespace Snipper
 
     public class HotKey : IDisposable
     {
+        private static IntPtr hWnd = (new WindowInteropHelper(HotKeyWindow.Instance)).Handle;
         // Registers a hot key with Windows.
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
@@ -48,14 +49,12 @@ namespace Snipper
 
         public int id;
         private bool disposed = false;
-        private IntPtr hWnd;
 
         public HotKey(int id, uint modifiers, uint vk)
         {
             this.id = id;
             this.disposed = false;
             this._Disabled = false;
-            hWnd = (new WindowInteropHelper(HotKeyWindow.Instance)).Handle;
             if (!RegisterHotKey(hWnd, id, modifiers, vk))
             {
                 MessageBox.Show("Failed to register hotkey with ID: " + id + " with error = " + Marshal.GetLastWin32Error());
@@ -95,6 +94,20 @@ namespace Snipper
             if (handler != null && !Disabled)
             {
                 handler(this, new HotKeyEventArgs(id));
+            }
+        }
+
+        private const int TEST_ID = -2147483648;
+        public static bool isHotKeyAvilable(uint modifiers, uint vk)
+        {
+            if (!RegisterHotKey(hWnd, TEST_ID, modifiers, vk))
+            {
+                return false;
+            }
+            else
+            {
+                UnregisterHotKey(hWnd, TEST_ID);
+                return true;
             }
         }
     }

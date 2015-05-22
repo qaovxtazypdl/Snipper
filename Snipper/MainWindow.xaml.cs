@@ -312,7 +312,10 @@ namespace Snipper
             }
             catch (FileNotFoundException)
             {
-                //fail silently
+                //open console
+                this.Show();
+                this.Activate();
+                this.Focus();  
             }
             ApplySettings();
             if (!CheckDirExistence(SaveDirectory)) return;
@@ -472,7 +475,7 @@ namespace Snipper
         {
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
-            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0)
+            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != SelectionCapModifiers || vkey != SelectionCapKey))
             {
                 WinSelTextBox.Text = GetKeyComboString(modifiers, (uint)KeyInterop.VirtualKeyFromKey(e.Key));
                 WindowCapKey = vkey;
@@ -485,7 +488,7 @@ namespace Snipper
         {
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
-            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0)
+            if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != WindowCapModifiers || vkey != WindowCapKey))
             {
                 AreaSelTextBox.Text = GetKeyComboString(modifiers, (uint)KeyInterop.VirtualKeyFromKey(e.Key));
                 SelectionCapKey = vkey;

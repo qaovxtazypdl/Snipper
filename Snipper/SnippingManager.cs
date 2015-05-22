@@ -179,12 +179,20 @@ namespace Snipper
         {
             DateTime currentTime = DateTime.Now;
             string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
-            using (FileStream fileStream = new FileStream(Path.Combine(SaveLocation, filename + ".png"), FileMode.Create))
+            try
             {
-                BitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(screencap));
-                encoder.Save(fileStream);
+                using (FileStream fileStream = new FileStream(Path.Combine(SaveLocation, filename + ".png"), FileMode.Create))
+                {
+                    BitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(screencap));
+                    encoder.Save(fileStream);
+                }
             }
+            catch (UnauthorizedAccessException)
+            {
+                //just ignore the error for now.
+            }
+
         }
 
         private void CopyBitmapToClipboard(BitmapSource screencap)
