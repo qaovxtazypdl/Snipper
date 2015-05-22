@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:local="clr-namespace:Snipper"
-        Title="Snipper Settings" Height="352.044" Width="204.802" Icon="Snipper.ico" AllowsTransparency="True" WindowStyle="None" Visibility="Hidden"
+        Title="Snipper Settings" Height="352.044" Width="204.802" Icon="Snipper.ico" AllowsTransparency="True" WindowStyle="None"
         MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized" Background="#E5FFFFFF" BorderThickness="1" BorderBrush="#FF3D0095">
     <Grid Margin="0,0,431,0">
         <!-- declare the command as a local resource -->
@@ -29,9 +29,9 @@
         </tb:TaskbarIcon>
         <Border Margin="10,232,-195,0" BorderThickness="1" BorderBrush="#FFEA6000" Grid.ColumnSpan="2" Height="74" VerticalAlignment="Top">
             <Grid Margin="-2,2,-2,-1" Height="71" VerticalAlignment="Top">
-                <CheckBox x:Name="SaveFolderCheckBox" Content="Save to Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="116" Margin="10,6,0,0" Checked="SaveDirButton_Checked" Unchecked="SaveDirButton_Unchecked" Background="#E5FFFFFF"/>
-                <CheckBox x:Name="CopyClipCheckBox" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Height="20" Width="116" Checked="CopyClipboardButton_Checked" Unchecked="CopyClipboardButton_Unchecked" Background="#E5FFFFFF"/>
-                <CheckBox x:Name="SupressCheckBox" Content="Supress Balloon Notifications" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Height="20" Width="177" Checked="SupressCheckBox_Checked" Unchecked="SupressCheckBox_Unchecked" Background="#E5FFFFFF"/>
+                <CheckBox x:Name="SaveFolderCheckBox" Content="Save to Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="146" Margin="10,6,0,0" Checked="SaveDirButton_Checked" Unchecked="SaveDirButton_Unchecked" Background="#E5FFFFFF"/>
+                <CheckBox x:Name="CopyClipCheckBox" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="10,0,0,25" VerticalAlignment="Bottom" Height="20" Width="146" Checked="CopyClipboardButton_Checked" Unchecked="CopyClipboardButton_Unchecked" Background="#E5FFFFFF"/>
+                <CheckBox x:Name="SupressCheckBox" Content="Supress Notifications" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Height="20" Width="146" Checked="SupressCheckBox_Checked" Unchecked="SupressCheckBox_Unchecked" Background="#E5FFFFFF"/>
             </Grid>
         </Border>
         <Border Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Margin="10,315,-95,0" BorderThickness="1" BorderBrush="#FF5D89FF" >
