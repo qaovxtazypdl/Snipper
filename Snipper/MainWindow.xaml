@@ -39,15 +39,15 @@
         </Border>
         <Border Grid.ColumnSpan="2" Margin="10,171,-195,0" BorderThickness="1" BorderBrush="#FFEA6000" Height="53" VerticalAlignment="Top">
             <Grid Margin="-2,8,0,-8">
-                <TextBox x:Name="SaveDirTextBox" Height="23" Margin="10,0,10,15" TextWrapping="Wrap" VerticalAlignment="Bottom" TextChanged="SaveDirectoryTextBox_TextChanged" Background="#E5FFFFFF"/>
+                <TextBox x:Name="SaveDirTextBox" Height="23" Margin="10,0,10,15" TextWrapping="NoWrap" VerticalAlignment="Bottom" TextChanged="SaveDirectoryTextBox_TextChanged" Background="#E5FFFFFF" AcceptsReturn="False"/>
                 <Label Content="Image Save Directory:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="177" Margin="2,-9,0,0"/>
             </Grid>
         </Border>
         <Border Grid.ColumnSpan="2" Margin="10,66,-195,0" BorderBrush="#FFEA6000" BorderThickness="1" Height="97" VerticalAlignment="Top">
             <Grid>
-                <TextBox x:Name="AreaSelTextBox" Height="23" Margin="10,65,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="SelectionCapTextBox_KeyDown" IsReadOnly="True" Background="#E5FFFFFF"/>
+                <TextBox x:Name="AreaSelTextBox" Height="23" Margin="10,65,10,0" TextWrapping="NoWrap" VerticalAlignment="Top" KeyDown="SelectionCapTextBox_KeyDown" IsReadOnly="True" Background="#E5FFFFFF" AcceptsReturn="False"/>
                 <Label Content="Custom Selection:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="167" Margin="0,43,0,0"/>
-                <TextBox x:Name="WinSelTextBox" Height="23" Margin="10,22,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="WindowCapTextBox_KeyDown" IsReadOnly="True" Background="#E5FFFFFF"/>
+                <TextBox x:Name="WinSelTextBox" Height="23" Margin="10,22,10,0" TextWrapping="NoWrap" VerticalAlignment="Top" KeyDown="WindowCapTextBox_KeyDown" IsReadOnly="True" Background="#E5FFFFFF" AcceptsReturn="False"/>
                 <Label Content="Foreground Window:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="167"/>
             </Grid>
         </Border>
