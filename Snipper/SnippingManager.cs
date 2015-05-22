@@ -41,10 +41,6 @@ namespace Snipper
             }
             set
             {
-                if (_hkeyWindowCap != null)
-                {
-                    _hkeyWindowCap.Dispose();
-                }
                 _hkeyWindowCap = value;
             }
         }
@@ -58,15 +54,11 @@ namespace Snipper
             }
             set
             {
-                if (_hkeyAreaCap != null)
-                {
-                    _hkeyAreaCap.Dispose();
-                }
                 _hkeyAreaCap = value;
             }
         }
 
-        internal enum SaveMode : uint
+        public enum SaveMode : uint
         {
             None = 0x0,
             ToClipboard = 0x1,
@@ -199,6 +191,18 @@ namespace Snipper
         private void CopyBitmapToClipboard(BitmapSource screencap)
         {
             System.Windows.Clipboard.SetImage(screencap);
+        }
+
+        public void ClearHotkeys()
+        {
+            if (hkeyWindowCap != null)
+            {
+                hkeyWindowCap.Dispose();
+            }
+            if (hkeyAreaCap != null)
+            {
+                hkeyAreaCap.Dispose();
+            }
         }
     }
 }

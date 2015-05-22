@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.IO;
 using System.Xml;
+using System.ComponentModel;
 
 namespace Snipper
 {
@@ -39,10 +40,17 @@ namespace Snipper
         public event EventHandler ShowEvent;
         public event EventHandler CloseEvent;
 
+        //variables to hold old values
+        private string c_SaveDirectory;
+        private uint c_WindowCapModifiers, c_WindowCapKey, c_SelectionCapModifiers, c_SelectionCapKey;
+        private bool c_SaveToFolderChecked, c_CopyToClipboardChecked;
+
+        //variables to hold new uncommitted values.
         private string SaveDirectory;
         private uint WindowCapModifiers, WindowCapKey, SelectionCapModifiers, SelectionCapKey;
         private bool SaveToFolderChecked, CopyToClipboardChecked;
         private bool _SettingsDirty;
+
         private bool SettingsDirty
         {
             get
@@ -61,24 +69,13 @@ namespace Snipper
             InitializeComponent();
             ShowEvent += ShowEventHandler;
             CloseEvent += CloseEventHandler;
-            LoadSettings();
+
             SettingsDirty = false;
             SaveDirectory = "?";
             WindowCapModifiers = WindowCapKey = SelectionCapModifiers = SelectionCapKey = 0;
             SaveToFolderChecked = CopyToClipboardChecked = false;
-
-            //SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N9, SnippingManager.Instance.HotKeyHandler);
-            SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.N, SnippingManager.Instance.HotKeyHandler);
-            //SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control | ModifierKeys.Shift), (uint)VirtualKey.N8, SnippingManager.Instance.HotKeyHandler);
-            SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, (uint)(ModifierKeys.Control), (uint)VirtualKey.B, SnippingManager.Instance.HotKeyHandler);
-        }
-
-        protected override void OnStateChanged(EventArgs e)
-        {
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.Hide();
-            }
+            BackupCurrentSettings();
+            LoadSettings();
         }
 
         public void ExecuteShowEvent()
@@ -115,8 +112,9 @@ namespace Snipper
             this.Close();
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
+            PromptSaveIfDirty();
             if (HotKeyWindow.RegisteredKeys != null)
             {
                 foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
@@ -124,8 +122,9 @@ namespace Snipper
                     hkey.Dispose();
                 }
             }
-            base.OnClosed(e);
+            base.OnClosing(e);
         }
+
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
@@ -139,13 +138,21 @@ namespace Snipper
             SaveSettings();
         }
 
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            CancelSave();
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
+
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            PromptSaveIfDirty();
             this.WindowState = WindowState.Minimized;
+            this.Hide();
         }
 
         private void SaveDirectoryTextBox_TextChanged(object sender, RoutedEventArgs e)
@@ -166,7 +173,7 @@ namespace Snipper
         {
             CheckBox source = (CheckBox)sender;
             CopyToClipboardChecked = source.IsChecked == true;
-            SettingsDirty = true;
+            SettingsDirty = true;  
         }
 
         private void SaveSettings()
@@ -227,17 +234,33 @@ namespace Snipper
 
         private void ApplySettings()
         {
+            BackupCurrentSettings();
+            SnippingManager.Instance.ClearHotkeys();
             SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, WindowCapModifiers, WindowCapKey, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
             SnippingManager.Instance.SaveLocation = SaveDirectory;
-            uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) & (uint)(SaveToFolderChecked? 0x1 : 0x0);
+            uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) & (uint)(SaveToFolderChecked? 0x2 : 0x0);
             SnippingManager.Instance.SavingMode = saveModeMask;
             SettingsDirty = false;
+            ReloadUISettings();
+        }
 
+        private void ReloadUISettings()
+        {
             SaveFolderCheckBox.IsChecked = SaveToFolderChecked;
             CopyClipCheckBox.IsChecked = CopyToClipboardChecked;
             SaveDirTextBox.Text = SaveDirectory;
-            //
+            //TODO
+        }
+
+        private void BackupCurrentSettings() {
+            c_SaveDirectory = SaveDirectory;
+            c_WindowCapModifiers = WindowCapModifiers;
+            c_WindowCapKey = WindowCapKey;
+            c_SelectionCapModifiers = SelectionCapModifiers;
+            c_SelectionCapKey = SelectionCapKey;
+            c_SaveToFolderChecked = SaveToFolderChecked;
+            c_CopyToClipboardChecked = CopyToClipboardChecked;
         }
 
         private void LoadSettings()
@@ -346,19 +369,31 @@ namespace Snipper
 
         private void PromptSaveIfDirty()
         {
-            MessageBoxResult saveWarningResult = MessageBox.Show("You have unsaved changes. Save?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (saveWarningResult == MessageBoxResult.Yes)
+            if (SettingsDirty)
             {
-                SaveSettings();
-            }
-            else
-            {
-                CancelSave();
+                MessageBoxResult saveWarningResult = MessageBox.Show("You have unsaved changes. Save?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (saveWarningResult == MessageBoxResult.Yes)
+                {
+                    SaveSettings();
+                }
+                else
+                {
+                    CancelSave();
+                }
             }
         }
 
-        private void CancelSave();
+        private void CancelSave()
+        {
+            SaveDirectory = c_SaveDirectory;
+            WindowCapModifiers = c_WindowCapModifiers;
+            WindowCapKey = c_WindowCapKey;
+            SelectionCapModifiers = c_SelectionCapModifiers;
+            SelectionCapKey = c_SelectionCapKey;
+            SaveToFolderChecked = c_SaveToFolderChecked;
+            CopyToClipboardChecked = c_CopyToClipboardChecked;
+            ReloadUISettings();
+        }
 
         private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
