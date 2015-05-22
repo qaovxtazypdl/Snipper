@@ -130,9 +130,6 @@ namespace Snipper
             public int Bottom;
         }
 
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
         public void HotKeyHandler(Object sender, HotKeyEventArgs e)
         {
             MainWindow.Instance.TrayIcon.HideBalloonTip();
@@ -176,57 +173,43 @@ namespace Snipper
 
         private string ProcessScreenshot(int minX, int minY, int maxX, int maxY)
         {
-            BitmapSource screencap = null;
-
             int width = maxX - minX;
             int height = maxY - minY;
+            string result = "";
 
             using (Bitmap screenBmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
             {
                 using (Graphics bmpGraphics = Graphics.FromImage(screenBmp))
                 {
-                    IntPtr Hbitmap = screenBmp.GetHbitmap();
                     bmpGraphics.CopyFromScreen(minX, minY, 0, 0, new System.Drawing.Size(width, height));
-                    screencap = Imaging.CreateBitmapSourceFromHBitmap(
-                        Hbitmap,
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-                    DeleteObject(Hbitmap);
                 }
-            }
 
-            if (screencap != null)
-            {
-                string result = "";
-                if ((SavingMode & (uint)SaveMode.ToClipboard) != 0)
+                if (screenBmp != null)
                 {
-                    result += CopyBitmapToClipboard(screencap);
+                    if ((SavingMode & (uint)SaveMode.ToClipboard) != 0)
+                    {
+                        result += CopyBitmapToClipboard(screenBmp);
+                    }
+                    if ((SavingMode & (uint)SaveMode.ToFile) != 0)
+                    {
+                        result += SaveBitmapToFile(screenBmp);
+                    }
                 }
-                if ((SavingMode & (uint)SaveMode.ToFile) != 0)
+                else
                 {
-                    result += SaveBitmapToFile(screencap);
+                    result += "No image was captured. (null bitmap) ";
                 }
-                return result;
             }
-            else
-            {
-                return "No image was captured. (null bitmap) ";
-            }
+            return result;
         }
 
-        private string SaveBitmapToFile(BitmapSource screencap)
+        private string SaveBitmapToFile(Bitmap screencap)
         {
             DateTime currentTime = DateTime.Now;
             string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
             try
             {
-                using (FileStream fileStream = new FileStream(Path.Combine(SaveLocation, filename + ".png"), FileMode.Create))
-                {
-                    BitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(screencap));
-                    encoder.Save(fileStream);
-                }
+                screencap.Save(Path.Combine(SaveLocation, filename + ".png"), ImageFormat.Png);
             }
             catch (UnauthorizedAccessException)
             {
@@ -235,9 +218,9 @@ namespace Snipper
             return "";
         }
 
-        private string CopyBitmapToClipboard(BitmapSource screencap)
+        private string CopyBitmapToClipboard(Bitmap screencap)
         {
-            System.Windows.Clipboard.SetImage(screencap);
+            System.Windows.Forms.Clipboard.SetImage(screencap);
             return "";
         }
 

@@ -26,10 +26,12 @@ namespace Snipper
         private static IntPtr hWnd = (new WindowInteropHelper(HotKeyWindow.Instance)).Handle;
         // Registers a hot key with Windows.
         [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
         // Unregisters the hot key with Windows.
         [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         public event HotkeyHandlerDelegate HotKeyPressedEvent;
