@@ -4,7 +4,7 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:local="clr-namespace:Snipper"
         Title="Snipper Settings" Height="327.044" Width="204.802" Icon="Snipper.ico" AllowsTransparency="True" WindowStyle="None"
-        MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized" Background="#E5FFFFFF" BorderThickness="1" BorderBrush="#FF3D0095">
+        MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized" Background="#E5FFFFFF" BorderThickness="1" BorderBrush="#FF3D0095" Visibility="Hidden">
     <Grid Margin="0,0,431,0">
         <!-- declare the command as a local resource -->
         <Grid.Resources>
