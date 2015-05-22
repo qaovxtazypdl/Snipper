@@ -92,8 +92,22 @@ namespace Snipper
             }
         }
 
+        private bool _SupressNotifications;
+        public bool SupressBalloonNotifications
+        {
+            get
+            {
+                return _SupressNotifications;
+            }
+            set
+            {
+                _SupressNotifications = value;
+            }
+        }
+
         private SnippingManager()
         {
+            _SupressNotifications = false;
             _hkeyWindowCap = null;
             _hkeyAreaCap = null;
             _savingMode = (uint)SaveMode.ToClipboard | (uint)SaveMode.ToFile;
@@ -120,13 +134,16 @@ namespace Snipper
         {
             MainWindow.Instance.TrayIcon.HideBalloonTip();
             string result = HotKeyProcesser(e.id);
-            if (result == "")
+            if (!SupressBalloonNotifications)
             {
-                MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", "Snip completed successfully.", BalloonIcon.Info);
-            }
-            else
-            {
-                MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", result, BalloonIcon.Warning);
+                if (result == "")
+                {
+                    MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", "Snip completed successfully.", BalloonIcon.Info);
+                }
+                else
+                {
+                    MainWindow.Instance.TrayIcon.ShowBalloonTip("Snipper", result, BalloonIcon.Warning);
+                }
             }
         }
 

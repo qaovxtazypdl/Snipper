@@ -44,12 +44,12 @@ namespace Snipper
         //variables to hold old values
         private string c_SaveDirectory;
         private uint c_WindowCapModifiers, c_WindowCapKey, c_SelectionCapModifiers, c_SelectionCapKey;
-        private bool c_SaveToFolderChecked, c_CopyToClipboardChecked;
+        private bool c_SaveToFolderChecked, c_CopyToClipboardChecked, c_SupressBalloonNotifications;
 
         //variables to hold new uncommitted values.
         private string SaveDirectory;
         private uint WindowCapModifiers, WindowCapKey, SelectionCapModifiers, SelectionCapKey;
-        private bool SaveToFolderChecked, CopyToClipboardChecked;
+        private bool SaveToFolderChecked, CopyToClipboardChecked, SupressBalloonNotifications;
         private bool _SettingsDirty;
 
         private bool SettingsDirty
@@ -74,7 +74,7 @@ namespace Snipper
             SettingsDirty = false;
             SaveDirectory = "?";
             WindowCapModifiers = WindowCapKey = SelectionCapModifiers = SelectionCapKey = 0;
-            SaveToFolderChecked = CopyToClipboardChecked = false;
+            SaveToFolderChecked = CopyToClipboardChecked = SupressBalloonNotifications = false;
             BackupCurrentSettings();
             LoadSettings();
             TrayIcon.ShowBalloonTip("Snipper", "Initialized in minimized mode.", BalloonIcon.Info);
@@ -205,6 +205,20 @@ namespace Snipper
             e.Handled = true;
         }
 
+        private void SupressCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            SupressBalloonNotifications = true;
+            SettingsDirty = true;
+            e.Handled = true;
+        }
+
+        void SupressCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SupressBalloonNotifications = false;
+            SettingsDirty = true;
+            e.Handled = true;
+        }
+
         private bool SaveSettings()
         {
             if (!CheckDirExistence(SaveDirectory))
@@ -257,6 +271,10 @@ namespace Snipper
                 xmlWriter.WriteStartElement(Constants.SAVE_IMAGE_TAG);
                 xmlWriter.WriteString("" + SaveToFolderChecked);
                 xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement(Constants.SUPRESS_TAG);
+                xmlWriter.WriteString("" + SupressBalloonNotifications);
+                xmlWriter.WriteEndElement();
             }
 
             xmlWriter.WriteEndElement();
@@ -276,6 +294,7 @@ namespace Snipper
             SnippingManager.Instance.SaveLocation = SaveDirectory;
             uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) | (uint)(SaveToFolderChecked? 0x2 : 0x0);
             SnippingManager.Instance.SavingMode = saveModeMask;
+            SnippingManager.Instance.SupressBalloonNotifications = SupressBalloonNotifications;
             ReloadUISettings();
             SettingsDirty = false;
         }
@@ -287,6 +306,7 @@ namespace Snipper
             c_SelectionCapModifiers = SelectionCapModifiers;
             c_SelectionCapKey = SelectionCapKey;
             c_SaveToFolderChecked = SaveToFolderChecked;
+            c_SupressBalloonNotifications = SupressBalloonNotifications;
             c_CopyToClipboardChecked = CopyToClipboardChecked;
         }
 
@@ -390,6 +410,12 @@ namespace Snipper
                         SaveToFolderChecked = reader.Value == ("" + true);
                         reader.Read();
                     }
+                    else if (reader.Name == Constants.SUPRESS_TAG)
+                    {
+                        reader.Read();
+                        SupressBalloonNotifications = reader.Value == ("" + true);
+                        reader.Read();
+                    }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement)
                 {
@@ -434,12 +460,14 @@ namespace Snipper
             SelectionCapModifiers = c_SelectionCapModifiers;
             SelectionCapKey = c_SelectionCapKey;
             SaveToFolderChecked = c_SaveToFolderChecked;
+            SupressBalloonNotifications = c_SupressBalloonNotifications;
             CopyToClipboardChecked = c_CopyToClipboardChecked;
             ReloadUISettings();
         }
 
         private void ReloadUISettings()
         {
+            SupressCheckBox.IsChecked = SupressBalloonNotifications;
             SaveFolderCheckBox.IsChecked = SaveToFolderChecked;
             CopyClipCheckBox.IsChecked = CopyToClipboardChecked;
             SaveDirTextBox.Text = SaveDirectory;
