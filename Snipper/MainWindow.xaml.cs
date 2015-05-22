@@ -289,8 +289,14 @@ namespace Snipper
         {
             BackupCurrentSettings();
             SnippingManager.Instance.ClearHotkeys();
-            SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, WindowCapModifiers, WindowCapKey, SnippingManager.Instance.HotKeyHandler);
-            SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
+            if (Constants.vkeyMap.ContainsKey(WindowCapKey) && WindowCapModifiers != 0 && HotKey.isHotKeyAvilable(WindowCapModifiers, WindowCapKey))
+            {
+                SnippingManager.Instance.hkeyWindowCap = new HotKey(Constants.CAP_WINDOW_HOTKEY, WindowCapModifiers, WindowCapKey, SnippingManager.Instance.HotKeyHandler);  
+            }
+            if (Constants.vkeyMap.ContainsKey(SelectionCapKey) && SelectionCapModifiers != 0 && HotKey.isHotKeyAvilable(SelectionCapModifiers, SelectionCapKey))
+            {
+                SnippingManager.Instance.hkeyAreaCap = new HotKey(Constants.CAP_AREA_HOTKEY, SelectionCapModifiers, SelectionCapKey, SnippingManager.Instance.HotKeyHandler);
+            }
             SnippingManager.Instance.SaveLocation = SaveDirectory;
             uint saveModeMask = (uint)(CopyToClipboardChecked? 0x1 : 0x0) | (uint)(SaveToFolderChecked? 0x2 : 0x0);
             SnippingManager.Instance.SavingMode = saveModeMask;
