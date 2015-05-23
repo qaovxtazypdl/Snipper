@@ -504,6 +504,7 @@ namespace Snipper
                 WinSelTextBox.Text = "";
                 WindowCapKey = 0;
                 WindowCapModifiers = 0;
+                SettingsDirty = true;
                 return;
             }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
@@ -524,6 +525,7 @@ namespace Snipper
                 AreaSelTextBox.Text = "";
                 SelectionCapKey = 0;
                 SelectionCapModifiers = 0;
+                SettingsDirty = true;
                 return;
             }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
