@@ -125,5 +125,10 @@ namespace GlobalHotKeys
                 return true;
             }
         }
+
+        public static void DisposeAll()
+        {
+            HotKeyWindow.Instance.Dispose();
+        }
     }
 }

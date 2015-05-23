@@ -123,13 +123,7 @@ namespace Snipper
                 return;
             }
 
-            if (HotKeyWindow.RegisteredKeys != null)
-            {
-                foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
-                {
-                    hkey.Dispose();
-                }
-            }
+            HotKey.DisposeAll();
             base.OnClosing(e);
         }
 

@@ -16,10 +16,10 @@ using System.Windows.Shapes;
 
 namespace GlobalHotKeys
 { 
-    public partial class HotKeyWindow : Window
+    public partial class HotKeyWindow : Window, IDisposable
     {
         private static HotKeyWindow _Instance = null;
-        internal static List<HotKey> RegisteredKeys = new List<HotKey>();
+        private static List<HotKey> RegisteredKeys = new List<HotKey>();
 
         public static HotKeyWindow Instance
         {
@@ -33,6 +33,7 @@ namespace GlobalHotKeys
             }
         }
 
+        private bool disposed = false;
         internal IntPtr hWnd;
         private HotKeyWindow() : base()
         {
@@ -73,6 +74,26 @@ namespace GlobalHotKeys
         internal static void RegisterHotKey(HotKey hkey)
         {
             RegisteredKeys.Add(hkey);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            disposed = true;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (RegisteredKeys != null)
+            {
+                foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
+                {
+                    hkey.Dispose();
+                }
+            }
         }
     }
 }

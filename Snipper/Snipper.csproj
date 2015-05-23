@@ -138,6 +138,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GlobalHotKeys\GlobalHotKeys.csproj">
+      <Project>{9252f724-8648-4cc8-9ba5-91a3327d47c0}</Project>
+      <Name>GlobalHotKeys</Name>
+    </ProjectReference>
     <ProjectReference Include="NotifyIconWpf\NotifyIconWpf.csproj">
       <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>
       <Name>NotifyIconWpf</Name>
