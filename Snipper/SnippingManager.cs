@@ -19,7 +19,7 @@ using GlobalHotKeys;
 
 namespace Snipper
 {
-    public class SnippingManager
+    public class SnippingManager : IDisposable
     {
         private static SnippingManager _Instance = null;
         public static SnippingManager Instance
@@ -108,6 +108,7 @@ namespace Snipper
 
         private SnippingManager()
         {
+            _disposed = false;
             _SupressNotifications = false;
             _hkeyWindowCap = null;
             _hkeyAreaCap = null;
@@ -235,6 +236,29 @@ namespace Snipper
             {
                 hkeyAreaCap.Dispose();
             }
+        }
+
+        private bool _disposed;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (hkeyAreaCap != null)
+            {
+                hkeyAreaCap.Dispose();
+            }
+            if (hkeyWindowCap != null)
+            {
+                hkeyWindowCap.Dispose();
+            }
+            _disposed = true;
         }
     }
 }

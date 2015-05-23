@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 
 namespace GlobalHotKeys
 { 
-    public partial class HotKeyWindow : Window, IDisposable
+    public partial class HotKeyWindow : Window
     {
         private static HotKeyWindow _Instance = null;
         private static List<HotKey> RegisteredKeys = new List<HotKey>();
@@ -33,14 +33,13 @@ namespace GlobalHotKeys
             }
         }
 
-        private bool disposed = false;
         internal IntPtr hWnd;
         private HotKeyWindow() : base()
         {
             //make this window invisible.
             InitializeComponent();
-            hWnd = (new WindowInteropHelper(this)).Handle;
             Show();
+            hWnd = (new WindowInteropHelper(this)).Handle;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -74,26 +73,6 @@ namespace GlobalHotKeys
         internal static void RegisterHotKey(HotKey hkey)
         {
             RegisteredKeys.Add(hkey);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            disposed = true;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-
-            if (RegisteredKeys != null)
-            {
-                foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
-                {
-                    hkey.Dispose();
-                }
-            }
         }
     }
 }

@@ -122,8 +122,6 @@ namespace Snipper
                 e.Cancel = true;
                 return;
             }
-
-            HotKey.DisposeAll();
             base.OnClosing(e);
         }
 
