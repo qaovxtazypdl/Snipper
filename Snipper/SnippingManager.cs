@@ -15,7 +15,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using Hardcodet.Wpf.TaskbarNotification;
-using GlobalHotKeys;
+using Qaovxtazypdl.GlobalHotKeys;
 
 namespace Snipper
 {
@@ -242,7 +242,6 @@ namespace Snipper
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

@@ -17,7 +17,7 @@ using System.IO;
 using System.Xml;
 using System.ComponentModel;
 using Hardcodet.Wpf.TaskbarNotification;
-using GlobalHotKeys;
+using Qaovxtazypdl.GlobalHotKeys;
 
 namespace Snipper
 {
@@ -122,6 +122,7 @@ namespace Snipper
                 e.Cancel = true;
                 return;
             }
+            SnippingManager.Instance.Dispose();
             base.OnClosing(e);
         }
 

@@ -14,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace GlobalHotKeys
+namespace Qaovxtazypdl.GlobalHotKeys
 { 
     public partial class HotKeyWindow : Window
     {
