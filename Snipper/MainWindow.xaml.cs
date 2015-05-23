@@ -331,12 +331,7 @@ namespace Snipper
             }
             catch (FileNotFoundException)
             {
-                //open console
-                this.Show();
-                this.Activate();
-                this.Focus();
-                this.WindowState = WindowState.Normal;
-                SettingsDirty = true;
+                //return without load.
                 return;
             }
             ApplySettings();
@@ -462,6 +457,7 @@ namespace Snipper
             SaveToFolderChecked = c_SaveToFolderChecked;
             SupressBalloonNotifications = c_SupressBalloonNotifications;
             CopyToClipboardChecked = c_CopyToClipboardChecked;
+            SettingsDirty = false;
             ReloadUISettings();
         }
 
@@ -503,6 +499,13 @@ namespace Snipper
 
         private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                WinSelTextBox.Text = "";
+                WindowCapKey = 0;
+                WindowCapModifiers = 0;
+                return;
+            }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
             if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != SelectionCapModifiers || vkey != SelectionCapKey))
@@ -516,6 +519,13 @@ namespace Snipper
 
         private void SelectionCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                AreaSelTextBox.Text = "";
+                SelectionCapKey = 0;
+                SelectionCapModifiers = 0;
+                return;
+            }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
             if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != WindowCapModifiers || vkey != WindowCapKey))

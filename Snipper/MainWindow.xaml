@@ -4,7 +4,7 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:local="clr-namespace:Snipper"
         Title="Snipper Settings" Height="352.044" Width="204.802" Icon="Snipper.ico" AllowsTransparency="True" WindowStyle="None" Visibility="Hidden"
-        MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized" Background="#E5FFFFFF" BorderThickness="1" BorderBrush="#FF3D0095">
+        MouseDown="Window_MouseDown" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Minimized" Background="#E5FFF8ED" BorderThickness="1" BorderBrush="#FF3D0095">
     <Grid Margin="0,0,431,0">
         <!-- declare the command as a local resource -->
         <Grid.Resources>
@@ -55,7 +55,7 @@
         <Image Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="30" Margin="15,10,-48,0" VerticalAlignment="Top" Width="33" Source="Snipper.ico"/>
         <Label Grid.ColumnSpan="2" Content="Snipper" HorizontalAlignment="Left" Margin="48,10,-135,0" VerticalAlignment="Top" Width="87" FontFamily="Walkway" FontSize="20" FontWeight="Bold" Height="35"/>
         <Button Content="" Click="CloseButton_Click" Background="#FF930000" BorderThickness="1" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="16" Margin="179,10,-195,0" Grid.ColumnSpan="2" FontSize="7" RenderTransformOrigin="-2,19.583" Height="16" VerticalAlignment="Top"/>
-        <Button Content="" Click="MinimizeButton_Click" Background="#FF00C373" BorderThickness="1" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="16" Margin="163,10,-179,0" Grid.ColumnSpan="2" FontSize="7" RenderTransformOrigin="0.5,-14.062" Height="16" VerticalAlignment="Top"/>
+        <Button Content="" Click="MinimizeButton_Click" Background="#FF00C373" BorderThickness="1" BorderBrush="{x:Null}" HorizontalAlignment="Left" Width="16" Margin="158,10,-174,0" Grid.ColumnSpan="2" FontSize="7" RenderTransformOrigin="0.5,-14.062" Height="16" VerticalAlignment="Top"/>
         <Border Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="85" Margin="110,315,-195,0" BorderThickness="1" BorderBrush="#FF5D89FF" >
             <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" BorderThickness="1" BorderBrush="{x:Null}" Height="23" Background="#01FFFFFF" HorizontalAlignment="Left" Width="83"/>
         </Border>
