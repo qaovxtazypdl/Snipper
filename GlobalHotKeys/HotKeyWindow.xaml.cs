@@ -14,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Snipper
+namespace GlobalHotKeys
 { 
     public partial class HotKeyWindow : Window
     {
@@ -33,10 +33,12 @@ namespace Snipper
             }
         }
 
+        internal IntPtr hWnd;
         private HotKeyWindow() : base()
         {
             //make this window invisible.
             InitializeComponent();
+            hWnd = (new WindowInteropHelper(this)).Handle;
             Show();
         }
 
@@ -49,7 +51,7 @@ namespace Snipper
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if(msg == Constants.WM_HOTKEY)
+            if(msg == HotKey.WM_HOTKEY)
             {
                 //check hotkey register ID
                 int id = wParam.ToInt32();

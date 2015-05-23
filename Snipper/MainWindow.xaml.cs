@@ -17,6 +17,7 @@ using System.IO;
 using System.Xml;
 using System.ComponentModel;
 using Hardcodet.Wpf.TaskbarNotification;
+using GlobalHotKeys;
 
 namespace Snipper
 {
@@ -343,10 +344,12 @@ namespace Snipper
                 //open console
                 this.Show();
                 this.Activate();
-                this.Focus();  
+                this.Focus();
+                SettingsDirty = true;
+                return;
             }
             ApplySettings();
-            if (!CheckDirExistence(SaveDirectory)) return;
+            CheckDirExistence(SaveDirectory);
         }
 
         private void LoadSettings(XmlReader reader) {
