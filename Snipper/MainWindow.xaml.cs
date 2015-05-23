@@ -104,10 +104,7 @@ namespace Snipper
             this.Show();
             this.Activate();
             this.Focus();  
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.WindowState = WindowState.Normal;
-            }
+            this.WindowState = WindowState.Normal;
         }
 
         private void CloseEventHandler(object sender, EventArgs e)
@@ -338,6 +335,7 @@ namespace Snipper
                 this.Show();
                 this.Activate();
                 this.Focus();
+                this.WindowState = WindowState.Normal;
                 SettingsDirty = true;
                 return;
             }
