@@ -206,7 +206,20 @@ namespace Snipper
         private string SaveBitmapToFile(Bitmap screencap)
         {
             DateTime currentTime = DateTime.Now;
-            string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second, currentTime.Millisecond);
+            string msPadding = "";
+            for (int i = 0; i < 2 - (int)Math.Log(currentTime.Millisecond, 10); i++)
+            {
+                msPadding += '0';
+            }
+
+            string filename = String.Format("{0}-{1}-{2}_{3}_{4}_{5}_{6}", 
+                currentTime.Year,
+                (currentTime.Month >= 10 ? "" : "0") + currentTime.Month,
+                (currentTime.Day >= 10 ? "" : "0") + currentTime.Day,
+                (currentTime.Hour >= 10 ? "" : "0") + currentTime.Hour,
+                (currentTime.Minute >= 10 ? "" : "0") + currentTime.Minute,
+                (currentTime.Second >= 10 ? "" : "0") + currentTime.Second,
+                msPadding + currentTime.Millisecond);
             try
             {
                 screencap.Save(Path.Combine(SaveLocation, filename + ".png"), ImageFormat.Png);

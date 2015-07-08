@@ -77,7 +77,6 @@ namespace Snipper
             SaveToFolderChecked = CopyToClipboardChecked = SupressBalloonNotifications = false;
             BackupCurrentSettings();
             LoadSettings();
-            TrayIcon.ShowBalloonTip("Snipper", "Initialized in minimized mode.", BalloonIcon.Info);
         }
 
         public void ExecuteShowEvent()
