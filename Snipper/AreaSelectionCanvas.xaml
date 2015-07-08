@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="GestureDrawer" WindowState="Maximized" WindowStyle="None" ResizeMode="NoResize"
-        ShowInTaskbar="False" ShowActivated="True" Background="#0FFFFFFF" AllowsTransparency="True"
-        Topmost = "true"
+        ShowInTaskbar="False" ShowActivated="True" Background="#19f58820" AllowsTransparency="True"
+        Topmost = "True"
         MouseMove="MouseMoveEventHandler" MouseDown="MouseDownEventHandler" MouseUp="MouseUpEventHandler"
         KeyDown="KeyDownEventHandler">
     <Grid Name="drawingGrid">

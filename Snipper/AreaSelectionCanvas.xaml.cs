@@ -56,7 +56,7 @@ namespace Snipper
             rect.Stroke = Brushes.Black;
 
             Color fillColor = new Color();
-            fillColor.A = 0x1f;
+            fillColor.A = 0x19;
             fillColor.R = fillColor.G = fillColor.B = 0xff;
             rect.Fill = new SolidColorBrush(fillColor);
 

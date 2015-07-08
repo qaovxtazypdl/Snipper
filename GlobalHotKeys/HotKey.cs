@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace Snipper
+namespace Qaovxtazypdl.GlobalHotKeys
 {
     public class HotKeyEventArgs : EventArgs
     {
@@ -23,7 +23,9 @@ namespace Snipper
 
     public class HotKey : IDisposable
     {
-        private static IntPtr hWnd = (new WindowInteropHelper(HotKeyWindow.Instance)).Handle;
+        internal const int WM_HOTKEY = 0x0312;
+        internal const int TEST_ID = -2147483648;
+
         // Registers a hot key with Windows.
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -49,7 +51,19 @@ namespace Snipper
             }
         }
 
-        public int id;
+        private int _id;
+        public int id
+        {
+            get
+            {
+                return _id;
+            }
+            internal set
+            {
+                _id = value;
+            }
+        }
+
         private bool disposed = false;
 
         public HotKey(int id, uint modifiers, uint vk)
@@ -57,7 +71,7 @@ namespace Snipper
             this.id = id;
             this.disposed = false;
             this._Disabled = false;
-            if (!RegisterHotKey(hWnd, id, modifiers, vk))
+            if (!RegisterHotKey(HotKeyWindow.Instance.hWnd, id, modifiers, vk))
             {
                 MessageBox.Show("Failed to register hotkey with ID: " + id + " with error = " + Marshal.GetLastWin32Error());
                 return;
@@ -83,7 +97,7 @@ namespace Snipper
             if (disposed)
                 return;
 
-            if (!UnregisterHotKey(hWnd, id))
+            if (!UnregisterHotKey(HotKeyWindow.Instance.hWnd, id))
             {
                 MessageBox.Show("Could not unregister the hotkey. Error = " + Marshal.GetLastWin32Error());
             }
@@ -99,16 +113,15 @@ namespace Snipper
             }
         }
 
-        private const int TEST_ID = -2147483648;
         public static bool isHotKeyAvilable(uint modifiers, uint vk)
         {
-            if (!RegisterHotKey(hWnd, TEST_ID, modifiers, vk))
+            if (!RegisterHotKey(HotKeyWindow.Instance.hWnd, TEST_ID, modifiers, vk))
             {
                 return false;
             }
             else
             {
-                UnregisterHotKey(hWnd, TEST_ID);
+                UnregisterHotKey(HotKeyWindow.Instance.hWnd, TEST_ID);
                 return true;
             }
         }

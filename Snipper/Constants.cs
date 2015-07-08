@@ -8,7 +8,6 @@ namespace Snipper
 {
     internal static class Constants
     {
-        public const int WM_HOTKEY = 0x0312;
         public const int CAP_WINDOW_HOTKEY = 1;
         public const int CAP_AREA_HOTKEY = 2;
 

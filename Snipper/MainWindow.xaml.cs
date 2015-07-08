@@ -17,6 +17,7 @@ using System.IO;
 using System.Xml;
 using System.ComponentModel;
 using Hardcodet.Wpf.TaskbarNotification;
+using Qaovxtazypdl.GlobalHotKeys;
 
 namespace Snipper
 {
@@ -102,10 +103,7 @@ namespace Snipper
             this.Show();
             this.Activate();
             this.Focus();  
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.WindowState = WindowState.Normal;
-            }
+            this.WindowState = WindowState.Normal;
         }
 
         private void CloseEventHandler(object sender, EventArgs e)
@@ -120,14 +118,7 @@ namespace Snipper
                 e.Cancel = true;
                 return;
             }
-
-            if (HotKeyWindow.RegisteredKeys != null)
-            {
-                foreach (HotKey hkey in HotKeyWindow.RegisteredKeys)
-                {
-                    hkey.Dispose();
-                }
-            }
+            SnippingManager.Instance.Dispose();
             base.OnClosing(e);
         }
 
@@ -339,13 +330,11 @@ namespace Snipper
             }
             catch (FileNotFoundException)
             {
-                //open console
-                this.Show();
-                this.Activate();
-                this.Focus();  
+                //return without load.
+                return;
             }
             ApplySettings();
-            if (!CheckDirExistence(SaveDirectory)) return;
+            CheckDirExistence(SaveDirectory);
         }
 
         private void LoadSettings(XmlReader reader) {
@@ -467,6 +456,7 @@ namespace Snipper
             SaveToFolderChecked = c_SaveToFolderChecked;
             SupressBalloonNotifications = c_SupressBalloonNotifications;
             CopyToClipboardChecked = c_CopyToClipboardChecked;
+            SettingsDirty = false;
             ReloadUISettings();
         }
 
@@ -508,6 +498,14 @@ namespace Snipper
 
         private void WindowCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                WinSelTextBox.Text = "";
+                WindowCapKey = 0;
+                WindowCapModifiers = 0;
+                SettingsDirty = true;
+                return;
+            }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
             if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != SelectionCapModifiers || vkey != SelectionCapKey))
@@ -521,6 +519,14 @@ namespace Snipper
 
         private void SelectionCapTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                AreaSelTextBox.Text = "";
+                SelectionCapKey = 0;
+                SelectionCapModifiers = 0;
+                SettingsDirty = true;
+                return;
+            }
             uint vkey = (uint)KeyInterop.VirtualKeyFromKey(e.Key);
             uint modifiers = (uint)e.KeyboardDevice.Modifiers;
             if (Constants.vkeyMap.ContainsKey(vkey) && modifiers != 0 && HotKey.isHotKeyAvilable(modifiers, vkey) && (modifiers != WindowCapModifiers || vkey != WindowCapKey))
